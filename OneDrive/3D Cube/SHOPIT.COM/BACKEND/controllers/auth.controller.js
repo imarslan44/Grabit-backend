@@ -13,38 +13,46 @@ export const signUp = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Missing required fields' });
     }
 
-    // Regex email validation
+  // Regex email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({ success: false, message: 'Invalid email format' });
     }
 
-    // Normalize email
+ // Normalize email
     const normalizedEmail = email.trim().toLowerCase();
-    // Hash password
+   
+// Hash password
     const hashedPassword =  bcrypt.hash(password, 10);
 
-    // Create user — rely on unique index at DB level to prevent duplicates
+// Create user — rely on unique index at DB level to prevent duplicates
     const user = await User.create({
       name,
       email: normalizedEmail,
       password: hashedPassword,
     });
 
-    // Sign JWT
+// Sign JWT 
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: JWT_EXPIRATION });
 
-    // Prepare safe user payload
+// Prepare safe user payload
     const safeUser = {
       _id: user._id,
       name: user.name,
       email: user.email,
     };
+//send cookie
+     res.cookie("token", token, {
+        httpOnly: true,
+        sameSite: "strict",
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
+     });
 
+//send response
     return res.status(201).json({
       success: true,
       message: 'User created successfully',
-      data: { token, user: safeUser },
+      data: {user: safeUser },
     });
 
   } catch (error) {
@@ -89,10 +97,16 @@ export const signIn = async (req, res)=>{
       email: user.email,
        };
 
-    res.status(200).json({
+       //send token in cookie
+      res.cookie("token", token, {
+          httpOnly: true,
+          maxAge: 24 * 60 * 60 * 1000, // 1 day
+        });
+
+    return res.status(200).json({
         success: true,
         message: "signedIN successfully!",
-        data: {token, safeUser}
+        data: {user : safeUser}
     });
 
    }catch(error){
