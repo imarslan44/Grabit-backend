@@ -45,6 +45,7 @@ export const signUp = async (req, res, next) => {
      res.cookie("token", token, {
         httpOnly: true,
         sameSite: "strict",
+        secure: true,
         maxAge: 24 * 60 * 60 * 1000, // 1 day
      });
 
@@ -99,9 +100,11 @@ export const signIn = async (req, res)=>{
 
        //send token in cookie
       res.cookie("token", token, {
-          httpOnly: true,
-          maxAge: 24 * 60 * 60 * 1000, // 1 day
-        });
+        httpOnly: true,
+        sameSite: "strict",
+        secure: true,
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
+     });
 
     return res.status(200).json({
         success: true,
@@ -114,4 +117,4 @@ export const signIn = async (req, res)=>{
         messsage: error.message,
     })
    }
-} 
+}  
