@@ -1,13 +1,13 @@
 import { Router } from "express";
-import { getProductList, getProductDetail, getSellerProducts, addProduct, updateProduct, deleteProduct } from "../controllers/product.controller";
+import { getProductList, getProductDetail, getSellerProducts, addProduct, updateProduct, deleteProduct } from "../controllers/product.controller.js";
 
-const productRouter = Router();
+const productRouter = Router(); 
 
 productRouter.get('/', getProductList);;
 
 productRouter.get("/:id", getProductDetail);
 
-productRouter.get("/seller", getSellerProducts)
+productRouter.get("/seller", getSellerProducts);
 
 productRouter.post("/", addProduct);
 
