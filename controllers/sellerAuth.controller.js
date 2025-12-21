@@ -1,6 +1,6 @@
 import Seller from "../models/seller.model.js";
 import jwt from "jsonwebtoken"
-import { JWT_SECRET, JWT_EXPIRATION } from "../config/index.js";
+import { JWT_SECRET, JWT_EXPIRATION } from "../config/env.js";
 import bcrypt from "bcryptjs";
 
 export const sellerSignUp = async (req, res) => {
@@ -42,8 +42,8 @@ export const sellerSignUp = async (req, res) => {
 
     const token = jwt.sign(
       { sellerId: newSeller._id },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRATION || "1h" }
+        JWT_SECRET,
+      { expiresIn: JWT_EXPIRATION || "1h" }
     );
 
     res.cookie("sellerToken", token, {
@@ -65,7 +65,7 @@ export const sellerSignUp = async (req, res) => {
   }
 };
 
-
+ 
 
 export const sellerSignIn = async (req, res) => { 
   try { 
@@ -89,8 +89,9 @@ export const sellerSignIn = async (req, res) => {
          if (!isMatch) {
            return res.status(401).json({ message: "Invalid credentials" }); 
           } 
-          const expiresIn = process.env.JWT_EXPIRATION || "1h";
-           const token = jwt.sign({ sellerId: seller._id }, process.env.JWT_SECRET, { expiresIn });
+          const expiresIn = JWT_EXPIRATION || "1h";
+
+           const token = jwt.sign({ sellerId: seller._id }, JWT_SECRET, { expiresIn });
 
             res.cookie("sellerToken", token, {
                httpOnly: true,

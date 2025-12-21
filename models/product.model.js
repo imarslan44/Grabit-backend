@@ -22,13 +22,11 @@ const productSchema = new mongoose.Schema({
       color: String,
       images: [String],
       price: Number,
-      discount: Number,
       stock: Number,
       sizes: [
         {
           size: String,
           price: Number,
-          discount: Number,
           stock: Number
         }
       ]
@@ -40,4 +38,6 @@ const productSchema = new mongoose.Schema({
 
 },{timestamps: true});
 
-export const Product = mongoose.model("Product", productSchema);
+ const Product = mongoose.model("Product", productSchema);
+
+ export default Product
