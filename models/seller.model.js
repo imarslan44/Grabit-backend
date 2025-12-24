@@ -9,6 +9,7 @@ const sellerSchema = new mongoose.Schema({
   password: {type: String, required: true, select: false, minLength: 8}, 
   phone: {type: String, required: true, unique: true},
   address: {type: String, required: true},
+  pinCode: {type: String, required: true},
   verified: {type: Boolean, default: false},
   PAN: {type: String, required: true, unique: true},
   AccountNumber: {type: String, required: true, unique: true},

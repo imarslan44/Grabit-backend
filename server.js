@@ -6,20 +6,24 @@ import cookieParser from 'cookie-parser';
 import cors from "cors"
 import cartRouter from "./routes/cart.routes.js";
 import productRouter from "./routes/product.routes.js";
-import sellerAuthRouter from "./routes/sellerAuth.routes.js";
+import sellerRouter from "./routes/sellerAuth.routes.js";
 const app = express();
 app.use(cors({
-  origin: "http://localhost:5173",
+  //multiple origins
+
+  origin: ["http://localhost:3000", "http://localhost:5173"],
+
+
   credentials: true
 }));
 app.use(express.json());
 app.use(cookieParser());
 
 //routes middlewares
-app.use("/api/userAuth", useraAuthRouter);
+app.use("/api/user", useraAuthRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/product", productRouter);
-app.use("/api/sellerAuth", sellerAuthRouter);
+app.use("/api/seller", sellerRouter);
 
 
 

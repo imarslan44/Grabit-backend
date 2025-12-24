@@ -12,7 +12,7 @@ export const AuthorizeSeller = async (req, res, next) => {
     const decoded = jwt.verify(token, JWT_SECRET);
     const seller = await Seller.findById(decoded.sellerId);
 
-    if (seller._id) {
+    if (!seller._id) {
       return res.status(404).json({ success: false, message: "Seller not found" });
     }
 

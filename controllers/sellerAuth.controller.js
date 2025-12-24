@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 
 export const sellerSignUp = async (req, res) => {
   try {
-    const { name, storeName, email, phone, address, PAN, AccountNumber, IFSC, verified, password } = req.body;
+    const { name, storeName, email, phone, address, pinCode, PAN, AccountNumber, IFSC, verified, password } = req.body;
 
     if (!name || !storeName || !email || !phone || !address || !PAN || !AccountNumber || !IFSC || !password) {
       return res.status(400).json({ message: "All fields are required" });
@@ -32,6 +32,7 @@ export const sellerSignUp = async (req, res) => {
       password: hashedPassword,
       phone,
       address,
+      pinCode,
       PAN,
       AccountNumber,
       IFSC,
@@ -89,7 +90,7 @@ export const sellerSignIn = async (req, res) => {
          if (!isMatch) {
            return res.status(401).json({ message: "Invalid credentials" }); 
           } 
-          const expiresIn = JWT_EXPIRATION || "1h";
+          const expiresIn = JWT_EXPIRATION || "3h";
 
            const token = jwt.sign({ sellerId: seller._id }, JWT_SECRET, { expiresIn });
 
@@ -102,7 +103,9 @@ export const sellerSignIn = async (req, res) => {
                seller.password = undefined; 
                // hide password before sending
 
-       return res.status(200).json({ message: "Seller signed in successfully", seller, token });
+       return res.status(200).json({
+         success: true,
+         message: "Seller signed in successfully", seller, token });
 
       }catch(error){
 

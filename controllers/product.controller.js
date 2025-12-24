@@ -1,4 +1,5 @@
-import cloudinary from "cloudinary"
+import cloudinary  from "../config/cloudinary.js";
+import streamifier from "streamifier"
 import Product from "../models/product.model.js"
 //product functions for user.....
 
@@ -26,9 +27,9 @@ try{
 const sellerId = req.sellerId;
 if(!sellerId) return res.status(401).json("unAuthorized");
 
-const { title, description, category, subcategory, name, highlights, dimensions, variants, bestSeller, discount} = req.body;
-const productImages = req.files;
+const { title, description, category, subcategory,  attributes, model, brand, variants, delivery, warranty,  discount} = req.body;
 
+const productImages = req.files;
 
 const uploadedUrls = [];
 
@@ -54,13 +55,17 @@ for(const image of productImages){
 
 let fieldIndex = 0;
 
-const finalVarients = variants.map((varient)=>{
+//const parsed = variants.flatMap(str => JSON.parse(str)); 
+const parseVariants = JSON.parse(variants)
+console.log("variants", parseVariants)
 
-    const imageCount = varient.images.length;
+const finalVarients = parseVariants.map((variant)=>{
+    console.log(variant)
+    const imageCount = variant.images.length;
     const endPoint = fieldIndex +imageCount
     const images = uploadedUrls.slice(fieldIndex, endPoint);
     fieldIndex = endPoint;
-    return {...varient, images}
+    return {...variant, images} 
 });
 
 
@@ -70,22 +75,23 @@ const finalVarients = variants.map((varient)=>{
 
 const finalProduct = {
     title,
-    name,
     description, 
     category,
     subcategory,
-    highlights: JSON.parse(highlights),
-    dimensions: JSON.parse(dimensions),
-    variants: JSON.parse(finalVarients),
-    bestSeller,
+    attributes: JSON.parse(attributes),
+    variants: finalVarients,
+    delivery: JSON.parse(delivery),
+    brand,
+    model,
+    warranty,
     discount,
-    sellerId 
+    sellerId    
 }
     console.log(finalProduct);
 
 
     const newProduct = await new Product(finalProduct);
-    await newProduct.save();
+     newProduct.save();
 
     return res.status(201).json({
         success: true,
@@ -94,7 +100,7 @@ const finalProduct = {
     })
 
     }catch(error){
-        return res.status(500).json({success: false, message: error.message})
+        return res.status(500).json({success: false, message: error.message, data: "error in product controller"})
     }
 };
 

@@ -1,43 +1,60 @@
-import mongoose from "mongoose"
-
-
+import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema({
-  sellerId: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},
-  title: String,
-  description: String,
-  category: String,
-  subcategory: String,
-  name: String,
-  highlights: [String],
-  dimensions: {
-    width:  Number,
-    height: Number,
-    length: Number,
-    weight: Number,
-    unit: String
+  sellerId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+
+  // Step 1: Basic Info
+  title: { type: String, required: true },
+  description: { type: String },
+  category: { type: String },
+  subcategory: { type: String },
+
+  // Step 3: Attributes & Specifications
+  attributes: {
+    specs: [String], // array of specifications
+    dimensions: {
+      length: { type: Number },
+      width: { type: Number },
+      height: { type: Number },
+      dimUnit: { type: String, default: "cm" }, // unit for length/width/height
+      weight: { type: Number },
+      weightUnit: { type: String, default: "g" } // unit for weight
+    }
   },
+
+  // Step 2: Variants
   variants: [
     {
-      color: String,
-      images: [String],
-      price: Number,
-      stock: Number,
+      color: { type: String },
+      images: [String], // Cloudinary URLs
+      price: { type: Number },
+      stock: { type: Number },
       sizes: [
         {
-          size: String,
-          price: Number,
-          stock: Number
+          size: { type: String },
+          price: { type: Number },
+          stock: { type: Number }
         }
       ]
     }
   ],
-  discount: {type: Number, default: 0},
-  bestSeller: {type: Boolean, default: false},
-  
 
-},{timestamps: true});
+  // Step 4: Meta Details
+  brand: { type: String },
+  model: { type: String },
+  warranty: { type: String },
+  discount: { type: Number, default: 0 },
+  bestSeller: { type: Boolean, default: false },
 
- const Product = mongoose.model("Product", productSchema);
+  // Step 5: Delivery Details
+  delivery: {
+    COD: { type: Boolean, default: true },
+    returnPolicy: { type: Number }, // days
+    shippingTime: { type: Number }, // days
+    deliveryAreas: [String] // array of pincodes
+  }
 
- export default Product
+}, { timestamps: true });
+
+
+export default mongoose.model("Product", productSchema);

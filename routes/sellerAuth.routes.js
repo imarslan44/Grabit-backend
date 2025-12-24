@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { sellerSignUp, sellerSignIn } from "../controllers/sellerAuth.controller.js";
-const sellerAuthRouter = Router();
+const sellerRouter = Router();
 
-sellerAuthRouter.post("/sign-up", sellerSignUp);
+sellerRouter.post("/sign-up", sellerSignUp);
 
-sellerAuthRouter.post("/sign-in", sellerSignIn);
+sellerRouter.post("/sign-in", sellerSignIn);
 
-export default sellerAuthRouter;
+export default sellerRouter; 
