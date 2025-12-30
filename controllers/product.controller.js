@@ -5,10 +5,44 @@ import Product from "../models/product.model.js"
 
 export const getProductList = async (req, res)=>{
 //productList for admin
+try{
+    const productList = await Product.find({})
+
+ 
+    if(!productList) return res.status(500).json('something went wrong')
+
+    return res.status(200).json({
+        success: true,
+        message: "product list retrieved",
+        data: productList
+
+    })
+    
+
+}catch(error){
+    res.status(error?.statusCode || 500 ).json(error.message)
+}
 }
 
 export const getProductDetail = async (req, res)=>{
 //product detail
+const {id} = req.params; 
+try{
+
+const productDetail = await Product.findById(id);
+
+if(!productDetail) return res.status(404).json("product Not found")
+
+    return res.status(201).json({
+        success: true,
+        message: "product detail retrieved",
+        productDetail,
+    })
+
+}catch(error){
+    res.status(error?.statusCode || 500).json(error.message)
+}
+
 };
 
 
@@ -32,6 +66,12 @@ const { title, description, category, subcategory,  attributes, model, brand, va
 const productImages = req.files;
 
 const uploadedUrls = [];
+
+if(!productImages) return res.status(401).json({success: false, message: "images are required"});
+
+if(!title || !description || !category || !subcategory || !attributes ||  !model || !brand || !variants[0] || !delivery ){
+    return res.status(401).json({success: false, message: "some required fiels are missing"});
+}
 
 for(const image of productImages){
     //upload to cloudinary
@@ -70,9 +110,6 @@ const finalVarients = parseVariants.map((variant)=>{
 
 
 
-
-
-
 const finalProduct = {
     title,
     description, 
@@ -92,21 +129,25 @@ const finalProduct = {
 
     const newProduct = await new Product(finalProduct);
      newProduct.save();
+     console.log()
+     if(!newProduct) return res.status(401).json("something went wrong");
 
     return res.status(201).json({
-        success: true,
+        success: true, 
         message: "You did It Product created Successfully",
         data: newProduct,
     })
 
     }catch(error){
-        return res.status(500).json({success: false, message: error.message, data: "error in product controller"})
+        return res.status(500).json({success: false, message: error.message})
     }
 };
 
 
+
 export const updateProduct = async (req, res)=>{
 //update product details for seller
+
 }
 
 export const deleteProduct = async (req, res)=>{

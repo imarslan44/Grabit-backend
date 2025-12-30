@@ -1,7 +1,7 @@
 import express from "express";
 import { PORT } from "./config/env.js";
 import connectDB from "./Database/mongodb.js";
-import useraAuthRouter from "./routes/userAuth.routes.js";
+import userAuthRouter from "./routes/userAuth.routes.js";
 import cookieParser from 'cookie-parser';
 import cors from "cors"
 import cartRouter from "./routes/cart.routes.js";
@@ -20,7 +20,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 //routes middlewares
-app.use("/api/user", useraAuthRouter);
+app.use("/api/user", userAuthRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/product", productRouter);
 app.use("/api/seller", sellerRouter);

@@ -6,18 +6,19 @@ import jwt from 'jsonwebtoken';
 export const authorize = async(req, res, next)=>{
 
     try{
-    const  token = req.cookies.authToken;
+
+    const  {token} = req.cookies;
     console.log("token",token);
-    if(!token) return res.status(401).json("unAuthorized");
+    if(!token) return res.status(401).json({success: false, message: "unAuthorized"});
 
     const decoded = jwt.verify(token, JWT_SECRET);
-    console.log("decoded: ", decoded);
+  
     const user = await User.findById(decoded.userId);
 
-    if(!user) return res.status(401).json("unAuthorized")
-        req.user = user;
-    next();
+    if(!user) return res.status(401).json({success: false, message: "unAuthorized"});
 
+        req.user = user;
+        next();
 
     }catch(error){
 

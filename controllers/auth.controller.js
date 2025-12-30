@@ -92,6 +92,7 @@ export const signIn = async (req, res)=>{
     }
 
     const token = jwt.sign({userId: user._id}, JWT_SECRET, {expiresIn: JWT_EXPIRATION});
+
      const safeUser = {
       _id: user._id,
       name: user.name,
@@ -106,6 +107,7 @@ export const signIn = async (req, res)=>{
         maxAge: 24 * 60 * 60 * 1000, // 1 day
      });
 
+     
     return res.status(200).json({
         success: true,
         message: "signedIN successfully!",
