@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-//seller schema
+//seller schema 
 const sellerSchema = new mongoose.Schema({
    
   name: {type: String, required: true},

@@ -1,6 +1,0 @@
-.env.development
-.env.production
-# Ignore all environment files
-.env
-.env.*
-

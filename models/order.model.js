@@ -15,16 +15,16 @@ const OrderSchema = new mongoose.Schema({
   address: {
     firstName: String,
     lastName: String,
-    mobile: {type: String, required:[true, "Mobile no required"]},
+    phone: {type: String, required:[true, "Mobile no required"]},
     street: { type: String, required: true },
     city: { type: String, required: true },
-    pincode: String,
-    landmark: String,  
+    pinCode: {type: String, required: true},
+    landMark: String,  
   },
-
-  status: { type: String, enum: ["placed", "shipped", "out for delivery", "delivered", "canceled", "return requested", "returned"], default: 'placed' },
-
-  paymentStatus: { type: String, enum: ["COD ",  "razorpay", "COD completed", "failed", "pending", "refund requested", "refunded", ]}
+  ammount : {type: Number, required : [true, "total ammout is required"]},
+  status: { type: String, enum: [ "failed", "placed", "shipped", "out for delivery", "delivered", "canceled", "return requested", "returned"], default: 'placed' },
+  paymentType: {type: String, enum: ["COD", "razorpay"] },
+  paymentStatus: { type: String, enum: [  "pending", "completed", "failed","refund requested", "refunded", ]}
   
 },{timestamps: true});
 
