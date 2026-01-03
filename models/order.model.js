@@ -21,7 +21,7 @@ const OrderSchema = new mongoose.Schema({
     pinCode: {type: String, required: true},
     landMark: String,  
   },
-  ammount : {type: Number, required : [true, "total ammout is required"]},
+  amount : {type: Number, required : [true, "total ammout is required"]},
   status: { type: String, enum: [ "failed", "placed", "shipped", "out for delivery", "delivered", "canceled", "return requested", "returned"], default: 'placed' },
   paymentType: {type: String, enum: ["COD", "razorpay"] },
   paymentStatus: { type: String, enum: [  "pending", "completed", "failed","refund requested", "refunded", ]}

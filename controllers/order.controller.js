@@ -2,6 +2,7 @@ import Product from "../models/product.model.js";
 import Order from "../models/order.model.js";
 import Razorpay from "razorpay"
 import { KEY_ID, KEY_SECRET } from "../config/env.js";
+import crypto from "crypto"; 
 
 
 const razorpay = new Razorpay({
@@ -10,53 +11,55 @@ const razorpay = new Razorpay({
 })
 
 export const placeOrderRazorpay = async (req, res)=>{
-
-     const {productID, variantIndex, quantity, address, sizeIndex, price} = req.body;
+ 
+     const {productId, variantIndex, quantity, address, sizeIndex, shipping} = req.body;
      const user = req.user;
 
     try{
-      if(!productID || !variantIndex || !quantity || !address){
+      if(!productId  || !quantity || !address){
 
             return  res.status(400).json({ error: "Required fields are missing" });
 ;
 
         };
 
- const product = await Product.findById(productID);
+ const product = await Product.findById(productId);
 
 
         if(!product) return res.json("Invalid productId");
 
         const variant = product.variants[variantIndex]; 
 
-        const actualPrice = variant.sizes && sizeIndex !== undefined ? variant.sizes[sizeIndex].price : variant.price;
-
-        if(price !== actualPrice ) res.json("price tempered");
+        const actualPrice = variant.sizes && sizeIndex !== undefined ? (variant.sizes[sizeIndex]?.price) : (variant.price )
+   
+        //if(price !== actualPrice ) res.json("price tempered");
+   const amount = ((actualPrice * quantity) + shipping) || 1;
 
         const orderData = {
             sellerId: product.sellerId,
             userId: user._id,
-            productID,
+            productId,
             variantIndex,
             quantity,
             address,
             sizeIndex,
-            price: actualPrice,
             status: "placed",
             paymentType: "razorpay",
             paymentStatus: "pending",
+            amount
+            
         };
 
 
         const newOrder = await Order.create(orderData);
 
         if(!newOrder) return res.json("something went wrong")
-
+        
             //create options object for razorpay order
             const options = {
-                amount: (actualPrice * 100),
+                amount: (amount * 100) || (1 * 100),
                 currency: "INR",
-                reciept: `rcpt_${Date.now()}`,
+                receipt: `rcpt_${Date.now()}`,
                 payment_capture: 1,
             };
 
@@ -66,6 +69,7 @@ export const placeOrderRazorpay = async (req, res)=>{
 
            return res.status(200).json({
             success: true,
+            message: "order create waiting for payment verificaiton",
             order,
             key_id: KEY_ID,
             order_id: newOrder._id
@@ -86,8 +90,9 @@ export const verifyRazorpay = async(req, res)=>{
 
    const sign = razorpay_order_id + "|" + razorpay_payment_id;
 
-   const expectedSign = crypto.hmac("sha256", KEY_SECRET)
-   .update(sign.toString())
+   const expectedSign = crypto 
+   .createHmac("sha256", KEY_SECRET) 
+   .update(sign.toString()) 
    .digest("hex");
 
    if(expectedSign === razorpay_signature){
@@ -124,7 +129,7 @@ export const verifyRazorpay = async(req, res)=>{
 // place order with COD (Cash on delivery)
 export const placeOrderCOD = async (req , res) =>{
 
-    const {productId, variantIndex, quantity, address, sizeIndex, shipping, price} = req.body;
+    const {productId, variantIndex, quantity, address, sizeIndex, shipping} = req.body;
 
     const user = req.user;
 
@@ -142,7 +147,7 @@ export const placeOrderCOD = async (req , res) =>{
         if(!product) return res.json("Invalid productId");
 
         const variant = product.variants[variantIndex]; 
-        const actualPrice = variant.sizes && sizeIndex !== undefined ? variant.sizes[sizeIndex].price : variant.price;
+        const actualPrice = variant.sizes && sizeIndex !== undefined ? variant.sizes[sizeIndex]?.price : variant?.price;
 
         //if(price !== actualPrice ) res.json("price tempered");
 
@@ -154,17 +159,19 @@ export const placeOrderCOD = async (req , res) =>{
             quantity,
             address,
             sizeIndex,
-            price: actualPrice,
             status: "placed",
             paymentType: "COD",
             paymentStatus: "pending",
-            ammount: (actualPrice * quantity) + shipping
+            amount: (actualPrice * quantity) + shipping
         };
+
+        
 
 
         const newOrder = await Order.create(orderData);
-        if(!newOrder) return res.json("something went wrong")
+        if(!newOrder) return res.json("something went wrong");
 
+        
         return res.status(200).json({
             success: true,
             message: "Order placed successfully",

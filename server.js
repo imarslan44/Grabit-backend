@@ -8,6 +8,7 @@ import cartRouter from "./routes/cart.routes.js";
 import productRouter from "./routes/product.routes.js";
 import sellerRouter from "./routes/sellerAuth.routes.js";
 import orderRouter from "./routes/order.routes.js";
+import userRouter from "./routes/user.routes.js";
 const app = express();
 app.use(cors({
   //multiple origins
@@ -25,7 +26,8 @@ app.use("/api/user", userAuthRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/product", productRouter);
 app.use("/api/seller", sellerRouter);
-app.use("/order", orderRouter)
+app.use("/api/order", orderRouter)
+app.use("/api/user", userRouter);
 
 
 
