@@ -3,6 +3,8 @@ import Order from "../models/order.model.js";
 import Razorpay from "razorpay"
 import { KEY_ID, KEY_SECRET } from "../config/env.js";
 import crypto from "crypto"; 
+import { read } from "fs";
+
 
 
 const razorpay = new Razorpay({
@@ -184,3 +186,98 @@ export const placeOrderCOD = async (req , res) =>{
         console.log(error.message)
     }
 }
+
+export const getSellerOrders = async (req, res) => {
+  const sellerId = req.sellerId; 
+ 
+  try {
+    const orders = await Order.find({ sellerId });
+
+    if (orders.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No orders yet!",
+        orders: [],
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Orders retrieved",
+      orders,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+
+
+export const getUserOrders = async (req, res) => {
+  const { _id } = req.user;
+
+  try {
+    const orders = await Order.find({ userId: _id });
+
+    if (orders.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No orders found!",
+        orders: [],
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Orders retrieved!",
+      orders,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+
+
+export const updateOrderStatus = async (req, res) => {
+
+  const { id } = req.params;
+  const { status } = req.body;
+
+  try {
+    const order = await Order.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true } // return updated document
+    );
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Order updated successfully",
+      order,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+
