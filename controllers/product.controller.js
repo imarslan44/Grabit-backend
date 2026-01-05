@@ -97,7 +97,7 @@ let fieldIndex = 0;
 
 //const parsed = variants.flatMap(str => JSON.parse(str)); 
 const parseVariants = JSON.parse(variants)
-console.log("variants", parseVariants)
+
 
 const finalVarients = parseVariants.map((variant)=>{
     console.log(variant)
@@ -124,7 +124,7 @@ const finalProduct = {
     discount,
     sellerId    
 }
-    console.log(finalProduct);
+    
 
 
     const newProduct = await new Product(finalProduct);

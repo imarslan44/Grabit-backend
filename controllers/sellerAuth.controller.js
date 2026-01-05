@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken"
 import { JWT_SECRET, JWT_EXPIRATION } from "../config/env.js";
 import bcrypt from "bcryptjs";
 
+
 export const sellerSignUp = async (req, res) => {
   try {
     const { name, storeName, email, phone, address, pinCode, PAN, AccountNumber, IFSC, verified, password } = req.body;
@@ -113,3 +114,18 @@ export const sellerSignIn = async (req, res) => {
 
   }
 }
+
+
+
+
+
+export const AuthorizeSellerToken = async (req, res) => {
+  try{
+    const sellerId = req.sellerId;
+
+    if(!sellerId) return res.status(400).json({success: false, message: "ID not found"})
+      return res.status(200).json({success: true, message: "Authorized"})
+  }catch(error){
+
+  }
+};

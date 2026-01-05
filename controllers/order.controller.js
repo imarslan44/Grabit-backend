@@ -201,10 +201,16 @@ export const getSellerOrders = async (req, res) => {
       });
     }
 
+  const orderData = await Promise.all( orders.map(async (odr) => { const { productId } = odr; const product = await Product.findById(productId).lean(); // lean gives plain object
+   return { ...odr.toObject(), product }; // convert order to plain object 
+  }) 
+);
+  
+
     return res.status(200).json({
       success: true,
       message: "Orders retrieved",
-      orders,
+      orderData,
     });
   } catch (error) {
     console.error(error);
