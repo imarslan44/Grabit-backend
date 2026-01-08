@@ -5,7 +5,7 @@ import Product from "../models/product.model.js"
 
 export const getProductList = async (req, res)=>{
 //productList for admin
-try{
+try{ 
     const productList = await Product.find({})
 
  
@@ -14,7 +14,7 @@ try{
     return res.status(200).json({
         success: true,
         message: "product list retrieved",
-        data: productList
+        data: productList 
 
     })
     
@@ -50,6 +50,31 @@ if(!productDetail) return res.status(404).json("product Not found")
 
 export const getSellerProducts = async (req, res)=>{
 //products of specific seller
+const sellerId = req.sellerId;
+
+try{
+    
+    console.log(sellerId);
+    
+    const products = await Product.find({sellerId : sellerId});
+
+    if(!products) return res.status(200).json({
+        success: false,
+        message: "no products yet!"
+    });
+
+    return res.status(200).json({
+        success: true,
+        message: "Products retrieved!",
+        products
+    })
+
+}catch(error){
+    console.log(error)
+    return res.status(500).json({success: false, message: "Internal server error!",
+    })
+
+}
 
 };
 
@@ -105,8 +130,10 @@ const finalVarients = parseVariants.map((variant)=>{
     const endPoint = fieldIndex +imageCount
     const images = uploadedUrls.slice(fieldIndex, endPoint);
     fieldIndex = endPoint;
-    return {...variant, images} 
+    return {...variant, images}; 
 });
+
+
 
 
 
@@ -152,5 +179,27 @@ export const updateProduct = async (req, res)=>{
 
 export const deleteProduct = async (req, res)=>{
 //delte product by seller;
+
+const {id} = req.params
+try{
+    const deletedProduct = await Product.findByIdAndDelete(id);
+
+    if(!deletedProduct) return res.status(200).json({success: false, message: "failed to delete this product"});
+
+    return res.status(200).json({
+        success: true,
+        message: `Product with _id: ${id} , has been deleted`,
+        deleteProduct,
+
+    })
+
+
+} catch(error){
+    console.log(error)
+    return res.status(500).json({
+        success: false,
+        message: "Internal server error"
+    });
+}
 }
 
