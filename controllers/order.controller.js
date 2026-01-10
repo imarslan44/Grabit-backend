@@ -175,6 +175,7 @@ export const placeOrderCOD = async (req , res) =>{
 
         
         return res.status(200).json({
+        
             success: true,
             message: "Order placed successfully",
             order: newOrder,
@@ -183,7 +184,7 @@ export const placeOrderCOD = async (req , res) =>{
 
     } catch(error){
         res.status(500).json("Internal server error");
-        console.log(error.message)
+        console.log(error.message);
     }
 }
 

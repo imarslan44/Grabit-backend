@@ -31,7 +31,8 @@ try{
 
 const productDetail = await Product.findById(id);
 
-if(!productDetail) return res.status(404).json("product Not found")
+if(!productDetail) return res.status(404).json("product Not found");
+
 
     return res.status(201).json({
         success: true,
@@ -50,13 +51,14 @@ if(!productDetail) return res.status(404).json("product Not found")
 
 export const getSellerProducts = async (req, res)=>{
 //products of specific seller
-const sellerId = req.sellerId;
+console.log("getSeller pr is running...");
 
+  const sellerId = req.sellerId;
+   console.log(sellerId);
+   
 try{
-    
-    console.log(sellerId);
-    
-    const products = await Product.find({sellerId : sellerId});
+
+    const products = await Product.find({sellerId});
 
     if(!products) return res.status(200).json({
         success: false,
@@ -67,23 +69,29 @@ try{
         success: true,
         message: "Products retrieved!",
         products
-    })
+    });
 
 }catch(error){
     console.log(error)
     return res.status(500).json({success: false, message: "Internal server error!",
-    })
+    });
 
 }
 
 };
+ 
+
 
 
 
 export const addProduct = async (req, res)=>{
+
 //add product use multer for images
+
 try{
+
 const sellerId = req.sellerId;
+
 if(!sellerId) return res.status(401).json("unAuthorized");
 
 const { title, description, category, subcategory,  attributes, model, brand, variants, delivery, warranty,  discount} = req.body;
@@ -95,6 +103,7 @@ const uploadedUrls = [];
 if(!productImages) return res.status(401).json({success: false, message: "images are required"});
 
 if(!title || !description || !category || !subcategory || !attributes ||  !model || !brand || !variants[0] || !delivery ){
+
     return res.status(401).json({success: false, message: "some required fiels are missing"});
 }
 
@@ -127,7 +136,7 @@ const parseVariants = JSON.parse(variants)
 const finalVarients = parseVariants.map((variant)=>{
     console.log(variant)
     const imageCount = variant.images.length;
-    const endPoint = fieldIndex +imageCount
+    const endPoint = fieldIndex + imageCount
     const images = uploadedUrls.slice(fieldIndex, endPoint);
     fieldIndex = endPoint;
     return {...variant, images}; 
@@ -163,7 +172,7 @@ const finalProduct = {
         success: true, 
         message: "You did It Product created Successfully",
         data: newProduct,
-    })
+    });
 
     }catch(error){
         return res.status(500).json({success: false, message: error.message})
@@ -191,7 +200,10 @@ try{
         message: `Product with _id: ${id} , has been deleted`,
         deleteProduct,
 
-    })
+    });
+
+
+
 
 
 } catch(error){

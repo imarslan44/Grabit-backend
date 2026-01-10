@@ -5,11 +5,14 @@ import { JWT_SECRET } from "../config/env.js";
 export const AuthorizeSeller = async (req, res, next) => {
   try {
     const token = req.cookies.sellerToken; // match cookie name
+    console.log("Token:", token)
     if (!token) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
 
     const decoded = jwt.verify(token, JWT_SECRET);
+     
+    if(!decoded.sellerId) return res.status(200).json({success : false, message: "sellerId not found "})
     const seller = await Seller.findById(decoded.sellerId);
 
     if (!seller._id) {
