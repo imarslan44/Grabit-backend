@@ -223,11 +223,11 @@ export const getSellerOrders = async (req, res) => {
 };
 
 
-
 export const getUserOrders = async (req, res) => {
   const { _id } = req.user;
 
   try {
+    // Step 1: Fetch orders for the user
     const orders = await Order.find({ userId: _id });
 
     if (orders.length === 0) {
@@ -238,11 +238,32 @@ export const getUserOrders = async (req, res) => {
       });
     }
 
+    // Step 2: Attach product image to each order
+    const enrichedOrders = await Promise.all(
+      orders.map(async (order) => {
+        const product = await Product.findById(order.productId).lean();
+
+        let productImage = "";
+        if (product) {
+          const variant = product.variants?.[order.variantIndex];
+          productImage =
+            variant?.images?.[0] || product.variants?.[0]?.images?.[0] || "";
+        }
+
+        return {
+          ...order.toObject(),
+          productImage,
+          productTitle: product?.title || "",
+        };
+      })
+    );
+
     return res.status(200).json({
       success: true,
       message: "Orders retrieved!",
-      orders,
+      orders: enrichedOrders,
     });
+    
   } catch (error) {
     console.error(error);
     return res.status(500).json({

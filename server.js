@@ -13,16 +13,14 @@ const app = express();
 app.use(cors({
   //multiple origins
 
-  origin: ["http://localhost:3000", "http://localhost:5173"],
-
- 
+  origin: ["http://localhost:3000", "http://localhost:5173", "https://gsthd191-5173.inc1.devtunnels.ms"],
   credentials: true
 }));
 app.use(express.json());
 app.use(cookieParser());
 
 //routes middlewares
-app.use("/api/user", userAuthRouter);
+app.use("/api/auth", userAuthRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/product", productRouter);
 app.use("/api/seller", sellerRouter);

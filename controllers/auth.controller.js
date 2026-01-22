@@ -66,7 +66,7 @@ export const signUp = async (req, res, next) => {
 };
 
 
-
+ 
 //login / signIn controller
 
 export const signIn = async (req, res)=>{
@@ -84,7 +84,7 @@ export const signIn = async (req, res)=>{
     }
 
     const isValidPassword =  await bcrypt.compare(password, user.password);
-  
+   
     if(!isValidPassword){
         const error = new Error("Invalid email or password");
         error.statusCode = 409;
@@ -120,3 +120,17 @@ export const signIn = async (req, res)=>{
     })
    }
 }  
+
+
+
+export const AuthorizeUserToken = async (req, res) => {
+  try{
+    const user = req.user;
+    if(!user._id) return res.status(400).json({success: false, message: "ID not found"})
+
+      return res.status(200).json({success: true, message: "Authorized"})
+
+  }catch(error){
+
+  }
+};
