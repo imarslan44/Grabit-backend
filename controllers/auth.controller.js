@@ -124,7 +124,8 @@ export const signIn = async (req, res)=>{
 
 
 export const AuthorizeUserToken = async (req, res) => {
-  try{
+  try{ 
+    
     const user = req.user;
     if(!user._id) return res.status(400).json({success: false, message: "ID not found"})
 

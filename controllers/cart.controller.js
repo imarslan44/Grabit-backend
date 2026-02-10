@@ -1,9 +1,9 @@
 import Cart from "../models/cart.model.js";
 import Product from "../models/product.model.js"
 export const getCartItems = async (req, res) =>{
+
     try{
 
-    
     const user = req.user;
     const cartItems = await Cart.find({userId: user._id});
     if(!cartItems) return res.status(404).json('no items in cart');
@@ -18,13 +18,11 @@ export const getCartItems = async (req, res) =>{
        const preDetails = {quantity: item.quantity, size: item.currentSize, productID: item.productId};
 
        return {_id : item._id, title: product.title, variant : selectedVariant, productId: product._id,  ...preDetails };
-    })
-  );
+      })
+    );
 
   console.log(products)
-
-    
-     
+  
     return res.status(200).json({
       success: true, 
       message: `${cartItems.length > 0 ? " cart items retrieved" :  "No items in cart"  }`, 

@@ -5,7 +5,6 @@ import { JWT_SECRET } from "../config/env.js";
 export const AuthorizeSeller = async (req, res, next) => {
   try {
     const token = req.cookies.sellerToken; // match cookie name
-    console.log("Token:", token)
     if (!token) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
@@ -29,7 +28,7 @@ export const AuthorizeSeller = async (req, res, next) => {
     if (error.name === "JsonWebTokenError") {
       return res.status(401).json({ success: false, message: "Invalid token" });
     }
-    console.error(error);
+  
     return res.status(500).json({ success: false, message: "Internal server error" });
   }
 };

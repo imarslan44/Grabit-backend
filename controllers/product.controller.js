@@ -1,6 +1,7 @@
 import cloudinary  from "../config/cloudinary.js";
 import streamifier from "streamifier"
 import Product from "../models/product.model.js"
+import Order from "../models/order.model.js"
 //product functions for user.....
 
 export const getProductList = async (req, res)=>{
@@ -79,9 +80,6 @@ try{
 }
 
 };
- 
-
-
 
 
 export const addProduct = async (req, res)=>{
@@ -190,24 +188,46 @@ export const deleteProduct = async (req, res)=>{
 //delte product by seller;
 
 const {id} = req.params
-try{
-    const deletedProduct = await Product.findByIdAndDelete(id);
 
-    if(!deletedProduct) return res.status(200).json({success: false, message: "failed to delete this product"});
+try{
+   
+    let activeOrders = false
+     //Getting orders from database
+    const OrdersAvailable = await Order.find({productId: id});
+
+    if(OrdersAvailable) {
+    OrdersAvailable.map((order)=>{
+    const status = order.status
+
+        if(status !== "succeed" || status !== "returned" || status !== "canceled" || status !== "failed"){
+            activeOrders = true;
+        }
+    }) 
+   }
+    
+
+    if(activeOrders) return res.json({ 
+        success: false,
+        message: "Delete failed This product have active orders",
+        data: OrdersAvailable,
+    })
+
+   const deletedProduct = await Product.findByIdAndDelete(id);
+
+
+    if(!deletedProduct) return res.status(200).json({success: false, message: "failed to delete this product may have already been deleted"});
 
     return res.status(200).json({
         success: true,
         message: `Product with _id: ${id} , has been deleted`,
         deleteProduct,
+        
 
     });
-
-
-
+    
 
 
 } catch(error){
-    console.log(error)
     return res.status(500).json({
         success: false,
         message: "Internal server error"

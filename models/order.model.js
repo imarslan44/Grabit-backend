@@ -22,7 +22,7 @@ const OrderSchema = new mongoose.Schema({
     landMark: String,  
   },
   amount : {type: Number, required : [true, "total ammout is required"]},
-  status: { type: String, enum: [ "failed", "placed", "shipped", "out for delivery", "delivered", "canceled", "return requested", "returned"], default: 'placed' },
+  status: { type: String, enum: [ "failed", "placed", "shipped", "out for delivery", "delivered", "canceled", "return requested", "returned",  "succeed"], default: 'placed'},
   paymentType: {type: String, enum: ["COD", "razorpay"] },
   paymentStatus: { type: String, enum: [  "pending", "completed", "failed","refund requested", "refunded", ]}
   
