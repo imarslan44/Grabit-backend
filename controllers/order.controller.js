@@ -16,12 +16,15 @@ export const placeOrderRazorpay = async (req, res)=>{
  
      const {productId, variantIndex, quantity, address, sizeIndex, shipping} = req.body;
      const user = req.user;
+     console.log("quantity:",quantity)
+     console.log("variantIndex:",variantIndex)
+     console.log("sizeIndex", siz)
+
 
     try{
       if(!productId  || !quantity || !address){
 
             return  res.status(400).json({ error: "Required fields are missing" });
-
 
         };
 
@@ -36,20 +39,18 @@ export const placeOrderRazorpay = async (req, res)=>{
 
       let actualPrice;
 
-     if (Array.isArray(variant.sizes) && variant.sizes.length > 0 && sizeIndex !== undefined) {
+     if (Array.isArray(variant.sizes) && variant.sizes.length > 0 && !sizeIndex ) {
         // Use the price from the selected size if available
      actualPrice = variant.sizes[sizeIndex]?.price ?? variant.price;
     } else {
       // No sizes defined → use the base variant price
-    actualPrice = variant.price;
+      actualPrice = variant.price;
     }
 
-   
+  
     //if(price !== actualPrice ) res.json("price tempered");
    const amount = ((Number(actualPrice) * Number(quantity)) + Number(shipping));
 
-  console.log("actual price:", actualPrice)
-   console.log("amount:", amount)
 
         const orderData = {
             sellerId: product.sellerId,
@@ -95,6 +96,7 @@ export const placeOrderRazorpay = async (req, res)=>{
 
     } catch(error){
         console.error(error); return res.status(500).json({ error: "Internal server error" });
+
     }
 }
 
@@ -164,9 +166,25 @@ export const placeOrderCOD = async (req , res) =>{
         if(!product) return res.json("Invalid productId");
 
         const variant = product.variants[variantIndex]; 
-        const actualPrice = variant.sizes && sizeIndex !== undefined ? variant.sizes[sizeIndex]?.price : variant?.price;
-
+       
         //if(price !== actualPrice ) res.json("price tempered");
+
+    
+      let actualPrice;
+
+     if (Array.isArray(variant.sizes) && variant.sizes.length > 0 && !sizeIndex ) {
+        // Use the price from the selected size if available
+     actualPrice = variant.sizes[sizeIndex]?.price ?? variant.price;
+    } else {
+      // No sizes defined → use the base variant price
+      actualPrice = variant.price;
+    }
+
+   
+    //if(price !== actualPrice ) res.json("price tempered");
+   const amount = ((Number(actualPrice) * Number(quantity)) + Number(shipping));
+
+ 
 
         const orderData = {
             sellerId: product.sellerId,
@@ -177,11 +195,12 @@ export const placeOrderCOD = async (req , res) =>{
             address,
             sizeIndex,
             status: "placed",
-            paymentType: "COD",
+            paymentType: "razorpay",
             paymentStatus: "pending",
-            amount: (actualPrice * quantity) + shipping
+            amount
+            
+            
         };
-
         
 
 
