@@ -16,9 +16,7 @@ export const placeOrderRazorpay = async (req, res)=>{
  
      const {productId, variantIndex, quantity, address, sizeIndex, shipping} = req.body;
      const user = req.user;
-     console.log("quantity:",quantity)
-     console.log("variantIndex:",variantIndex)
-     console.log("sizeIndex", siz)
+    
 
 
     try{
@@ -272,22 +270,25 @@ export const getUserOrders = async (req, res) => {
       });
     }
 
-    // Step 2: Attach product image to each order
+    // Step 2: Attach product image and returnPolicy to each order
     const enrichedOrders = await Promise.all(
       orders.map(async (order) => {
         const product = await Product.findById(order.productId).lean();
 
         let productImage = "";
+        let returnPolicy = null;
         if (product) {
           const variant = product.variants?.[order.variantIndex];
           productImage =
             variant?.images?.[0] || product.variants?.[0]?.images?.[0] || "";
+          returnPolicy = product.delivery?.returnPolicy || null;
         }
 
         return {
           ...order.toObject(),
           productImage,
           productTitle: product?.title || "",
+          returnPolicy,
         };
       })
     );

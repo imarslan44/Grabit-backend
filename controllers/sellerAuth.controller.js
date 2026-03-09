@@ -49,13 +49,16 @@ export const sellerSignUp = async (req, res) => {
     );
 
     res.cookie("sellerToken", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: (process.env.JWT_EXPIRATION ? parseInt(process.env.JWT_EXPIRATION) : 3600) * 1000
-    });
+               httpOnly: true,
+               secure: process.env.NODE_ENV === "production",
+               sameSite: "lax", 
+               maxAge: typeof expiresIn === "number" ? expiresIn * 1000 : 3600000 }); 
+
+              
+               // hide password before sending
 
     return res.status(201).json({
+      success: true,
       message: "Seller registered successfully",
       seller: newSeller,
       token
@@ -122,10 +125,10 @@ export const sellerSignIn = async (req, res) => {
 export const AuthorizeSellerToken = async (req, res) => {
   try{
     const sellerId = req.sellerId;
-
+    
     if(!sellerId) return res.status(400).json({success: false, message: "ID not found"})
       return res.status(200).json({success: true, message: "Authorized"})
   }catch(error){
-
+     res.json("inernal sercer error")
   }
 };

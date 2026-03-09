@@ -1,5 +1,6 @@
 import Cart from "../models/cart.model.js";
 import Product from "../models/product.model.js"
+
 export const getCartItems = async (req, res) =>{
 
     try{
@@ -10,8 +11,10 @@ export const getCartItems = async (req, res) =>{
 
     const products = await Promise.all( 
       cartItems.map( async (item)=>{
-       const product = await Product.findById(item.productId).select("title variants _id");
-       if(!product)return res.status(404).json("cart items not found");
+
+       const product = await Product.findById(item.productId).select("title variants _id");    
+
+       if(!product) res.status(404).json("cart items not found");
 
        const selectedVariant = product.variants[item.variantIndex];
 
