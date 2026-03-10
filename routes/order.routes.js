@@ -3,6 +3,7 @@ import { placeOrderCOD, placeOrderRazorpay, verifyRazorpay } from "../controller
 import {authorize} from "../middlewares/auth.meddlewares.js"
 import { AuthorizeSeller } from "../middlewares/sellerAuth.middlerwares.js";
 import { updateOrderStatus, getSellerOrders, getUserOrders } from "../controllers/order.controller.js";
+import { cancelRequest } from "../controllers/order.controller.js";
 
 const orderRouter = Router();
 
@@ -16,6 +17,8 @@ orderRouter.post("/razorpay/verify", verifyRazorpay);
 // routes to update order data 
 
 orderRouter.patch("/status/:id", AuthorizeSeller, updateOrderStatus)
+
+orderRouter.patch("/cancel/:id", authorize, cancelRequest)
 
 // routes to get order details
 

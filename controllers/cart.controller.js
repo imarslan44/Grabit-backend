@@ -7,14 +7,14 @@ export const getCartItems = async (req, res) =>{
 
     const user = req.user;
     const cartItems = await Cart.find({userId: user._id});
-    if(!cartItems) return res.status(404).json('no items in cart');
+  if(!cartItems || cartItems.length === 0) return res.status(404).json({ success: false, message: 'no items in cart' });
 
     const products = await Promise.all( 
       cartItems.map( async (item)=>{
 
        const product = await Product.findById(item.productId).select("title variants _id");    
 
-       if(!product) res.status(404).json("cart items not found");
+      if(!product) throw { statusCode: 404, message: "cart items not found" };
 
        const selectedVariant = product.variants[item.variantIndex];
 
@@ -32,7 +32,9 @@ export const getCartItems = async (req, res) =>{
       cartItems: products});
 
     }catch(error){
-        res.status(500).json({success: false, message: error.message})
+      const status = error && error.statusCode ? error.statusCode : 500;
+      const message = error && error.message ? error.message : String(error);
+      res.status(status).json({ success: false, message });
     }
 }
 

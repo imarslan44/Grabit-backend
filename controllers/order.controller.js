@@ -344,3 +344,33 @@ export const updateOrderStatus = async (req, res) => {
 };
 
 
+export const cancelRequest = async (req, res)=>{
+
+
+  try{
+    const status = "cancelation request"
+    const {id} = req.params
+    
+    if (!id) {
+      return res.status(400).json({ success: false, message: "order id is required" });
+    }
+ 
+    const updatedOrder = await Order.findByIdAndUpdate( 
+      id,
+      { status },
+      { new: true } // return updated document)
+    )
+     if(!updatedOrder) return res.status(200).json({
+      success: false,
+      message: "something went wrong",
+     });
+
+     return res.status(200).json({
+      success: true,
+      message: "cancelation request sent successfully"
+     })
+  } catch(error){
+   console.log(error)
+  }
+
+}

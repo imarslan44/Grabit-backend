@@ -9,13 +9,17 @@ import productRouter from "./routes/product.routes.js";
 import sellerRouter from "./routes/sellerAuth.routes.js";
 import orderRouter from "./routes/order.routes.js";
 import userRouter from "./routes/user.routes.js";
-const app = express();
-app.use(cors({
-  //multiple origins
 
-  origin: ["http://localhost:3000", "http://localhost:5173", "https://gsthd191-5173.inc1.devtunnels.ms", ""],
+const app = express();
+ app.use(cors({
+   //multiple origins
+
+  origin: ["http://localhost:3000", "http://localhost:5173", "https://gsthd191-5173.inc1.devtunnels.ms"],
   credentials: true
 }));
+// app.use(cors({
+//   origin: "*"
+// }))
 app.use(express.json());
 app.use(cookieParser());
 
