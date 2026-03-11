@@ -58,9 +58,9 @@ export const placeOrderRazorpay = async (req, res)=>{
             quantity,
             address,
             sizeIndex,
-            status: "placed",
+            status: "failed",
             paymentType: "razorpay",
-            paymentStatus: "pending",
+            paymentStatus: "failed",
             amount
             
             

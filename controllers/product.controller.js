@@ -52,10 +52,10 @@ if(!productDetail) return res.status(404).json("product Not found");
 
 export const getSellerProducts = async (req, res)=>{
 //products of specific seller
-console.log("getSeller pr is running...");
+
 
   const sellerId = req.sellerId;
-   console.log(sellerId);
+ 
    
 try{
 
