@@ -1,7 +1,8 @@
 import cloudinary  from "../config/cloudinary.js";
 import streamifier from "streamifier"
 import Product from "../models/product.model.js"
-import Order from "../models/order.model.js"
+import Order from "../models/order.model.js";
+import Cart from "../models/cart.model.js"
 //product functions for user.....
 
 export const getProductList = async (req, res)=>{
@@ -184,54 +185,54 @@ export const updateProduct = async (req, res)=>{
 
 }
 
-export const deleteProduct = async (req, res)=>{
-//delte product by seller;
+export const deleteProduct = async (req, res) => {
+  const { id } = req.params;
 
-const {id} = req.params
+  try {
+    // 1) Check orders for this product
+    const OrdersAvailable = await Order.find({ productId: id });
+    let activeOrders = false;
 
-try{
-   
-    let activeOrders = false
-     //Getting orders from database
-    const OrdersAvailable = await Order.find({productId: id});
-
-    if(OrdersAvailable) {
-    OrdersAvailable.map((order)=>{
-    const status = order.status
-
-        if(status !== "succeed" || status !== "returned" || status !== "canceled" || status !== "failed"){
-            activeOrders = true;
+    if (OrdersAvailable && OrdersAvailable.length > 0) {
+      for (const order of OrdersAvailable) {
+        const status = order.status;
+        if (!["succeed", "returned", "canceled", "failed"].includes(status)) {
+          activeOrders = true;
+          break;
         }
-    }) 
-   }
-    
+      }
+    }
 
-    if(activeOrders) return res.json({ 
+    if (activeOrders) {
+      return res.json({
         success: false,
-        message: "Delete failed This product have active orders",
+        message: "Delete failed. This product has active orders.",
         data: OrdersAvailable,
-    })
+      });
+    }
 
-   const deletedProduct = await Product.findByIdAndDelete(id);
+    // 2) Mark related cart items unavailable (bulk update)
+    await Cart.updateMany({ productId: id }, { $set: { available: false } });
 
+    // 3) Delete the product
+    const deletedProduct = await Product.findByIdAndDelete(id);
 
-    if(!deletedProduct) return res.status(200).json({success: false, message: "failed to delete this product may have already been deleted"});
+    if (!deletedProduct) {
+      return res.status(200).json({
+        success: false,
+        message: "Failed to delete this product — it may already be deleted.",
+      });
+    }
 
     return res.status(200).json({
-        success: true,
-        message: `Product with _id: ${id} , has been deleted`,
-        deleteProduct,
-        
-
+      success: true,
+      message: `Product with _id: ${id} has been deleted`,
+      data: deletedProduct,
     });
-    
-
-
-} catch(error){
+  } catch (error) {
     return res.status(500).json({
-        success: false,
-        message: "Internal server error"
+      success: false,
+      message: "Internal server error",
     });
-}
-}
-
+  }
+};

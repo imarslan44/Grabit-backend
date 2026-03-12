@@ -1,42 +1,45 @@
 import Cart from "../models/cart.model.js";
 import Product from "../models/product.model.js"
 
-export const getCartItems = async (req, res) =>{
-
-    try{
-
+export const getCartItems = async (req, res) => {
+  try {
     const user = req.user;
-    const cartItems = await Cart.find({userId: user._id});
-  if(!cartItems || cartItems.length === 0) return res.status(404).json({ success: false, message: 'no items in cart' });
+    const cartItems = await Cart.find({ userId: user._id });
+    if (!cartItems || cartItems.length === 0)
+      return res.status(404).json({ success: false, message: "no items in cart" });
 
-    const products = await Promise.all( 
-      cartItems.map( async (item)=>{
+    const productIds = cartItems.map(i => i.productId);
+    const productsList = await Product.find({ _id: { $in: productIds } }).select("title variants _id");
+    const productsById = new Map(productsList.map(p => [p._id.toString(), p]));
 
-       const product = await Product.findById(item.productId).select("title variants _id");    
+    const products = cartItems.map(item => {
+      const product = productsById.get(String(item.productId));
+      if (!product) {
+        return { _id: item._id, productId: item.productId, available: false, message: "product deleted" };
+      }
+      const variantIndex = Number.isInteger(item.variantIndex) ? item.variantIndex : parseInt(item.variantIndex) || 0;
+      const selectedVariant = product.variants?.[variantIndex] ?? null;
+      return {
+        _id: item._id,
+        title: product.title,
+        variant: selectedVariant,
+        productId: product._id,
+        quantity: item.quantity,
+        size: item.currentSize,
+      };
+    });
 
-      if(!product) throw { statusCode: 404, message: "cart items not found" };
-
-       const selectedVariant = product.variants[item.variantIndex];
-
-       const preDetails = {quantity: item.quantity, size: item.currentSize, productID: item.productId};
-
-       return {_id : item._id, title: product.title, variant : selectedVariant, productId: product._id,  ...preDetails };
-      })
-    );
-
-  console.log(products)
-  
     return res.status(200).json({
-      success: true, 
-      message: `${cartItems.length > 0 ? " cart items retrieved" :  "No items in cart"  }`, 
-      cartItems: products});
-
-    }catch(error){
-      const status = error && error.statusCode ? error.statusCode : 500;
-      const message = error && error.message ? error.message : String(error);
-      res.status(status).json({ success: false, message });
-    }
-}
+      success: true,
+      message: "cart items retrieved",
+      cartItems: products,
+    });
+  } catch (error) {
+    const status = error && error.statusCode ? error.statusCode : 500;
+    const message = error && error.message ? error.message : String(error);
+    res.status(status).json({ success: false, message });
+  }
+};
 
 
 export const addToCart = async (req, res) => {
@@ -44,7 +47,7 @@ export const addToCart = async (req, res) => {
     const { productId, quantity, variantIndex, currentSize } = req.body;
     const user = req.user;
 
-    console.log(req.body)
+
 
     // Basic validation
     if (!productId || !quantity || quantity <= 0 ) {
@@ -79,7 +82,7 @@ export const addToCart = async (req, res) => {
       cartItem: newCartItem,
     });
   } catch (error) {
-    console.error(error);
+    
     res.status(error.statusCode || 500).json({
       success: false,
       message: error.message || "Server error",

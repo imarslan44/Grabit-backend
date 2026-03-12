@@ -5,6 +5,7 @@ const CartSchema =  new mongoose.Schema({
     productId: {type: mongoose.Schema.Types.ObjectId, ref: "Product"},
     quantity: {type: Number, required: [true, "quantity required"]},
     variantIndex: {type: Number, required: [true, "Selected Varient  required"]},
+    available: {type: Boolean, default: true},
     currentSize: String 
 });
 
