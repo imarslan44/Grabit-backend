@@ -11,15 +11,8 @@ import orderRouter from "./routes/order.routes.js";
 import userRouter from "./routes/user.routes.js";
 
 const app = express();
- app.use(cors({
-   //multiple origins
+ app.use(cors({ origin: (o, cb) => cb(null, true), credentials: true }));
 
-  origin: ["http://localhost:3000", "http://localhost:5173", "https://gsthd191-5173.inc1.devtunnels.ms"],
-  credentials: true
-}));
-// app.use(cors({
-//   origin: "*"
-// }))
 app.use(express.json());
 app.use(cookieParser());
 
@@ -38,7 +31,7 @@ app.get('/', (req, res)=>{
 });
 
 
-app.listen(PORT, ()=>{
+app.listen(PORT, '0.0.0.0', ()=>{
     console.log(`server is running on http://localhost:${PORT}`);
     connectDB();
 })

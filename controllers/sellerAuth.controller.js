@@ -99,10 +99,12 @@ export const sellerSignIn = async (req, res) => {
            const token = jwt.sign({ sellerId: seller._id }, JWT_SECRET, { expiresIn });
 
             res.cookie("sellerToken", token, {
-               httpOnly: true,
-               secure: process.env.NODE_ENV === "production",
-               sameSite: "lax", 
-               maxAge: typeof expiresIn === "number" ? expiresIn * 1000 : 3600000 }); 
+                httpOnly: true,
+                //every site but secure only in production
+                // sameSite: "none",
+                secure: process.env.NODE_ENV === "production",
+                maxAge: 24 * 60 * 60 * 1000, // 1 day
+                });
 
                seller.password = undefined; 
                // hide password before sending
@@ -126,8 +128,10 @@ export const AuthorizeSellerToken = async (req, res) => {
   try{
     const sellerId = req.sellerId;
     
-    if(!sellerId) return res.status(400).json({success: false, message: "ID not found"})
-      return res.status(200).json({success: true, message: "Authorized"})
+    if(!sellerId) return res.status(400).json({success: false, message: "ID not found"});
+
+      return res.status(200).json({success: true, message: "Authorized"});
+
   }catch(error){
      res.json("inernal sercer error")
   }

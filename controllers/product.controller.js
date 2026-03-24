@@ -7,10 +7,11 @@ import Cart from "../models/cart.model.js"
 
 export const getProductList = async (req, res)=>{
 //productList for admin
+let index = req.query.index || 0;
 try{ 
-    const productList = await Product.find({})
+    //pagination can be implemented here using index and limit
+    const productList = await Product.find().skip(index).limit(20);
 
- 
     if(!productList) return res.status(500).json('something went wrong')
 
     return res.status(200).json({
