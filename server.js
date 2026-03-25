@@ -9,9 +9,17 @@ import productRouter from "./routes/product.routes.js";
 import sellerRouter from "./routes/sellerAuth.routes.js";
 import orderRouter from "./routes/order.routes.js";
 import userRouter from "./routes/user.routes.js";
-
+import { FRONTEND_URL, SELLER_SITE_URL } from "./config/env.js";
+console.log("CORS allowed origins:", FRONTEND_URL, SELLER_SITE_URL);
 const app = express();
- app.use(cors({ origin: (o, cb) => cb(null, true), credentials: true }));
+
+ //app.use(cors({ origin: [FRONTEND_URL, SELLER_SITE_URL] })) 
+ // allow CORS for frontend and seller origins and include credentials ;
+app.use(cors({
+  origin: [FRONTEND_URL, SELLER_SITE_URL],
+  credentials: true,
+}));
+
 
 app.use(express.json());
 app.use(cookieParser());
