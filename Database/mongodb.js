@@ -3,22 +3,20 @@ import { DB_URI } from "../config/env.js";
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(DB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    console.log("Connecting to MongoDB..."); //is logged
+    await mongoose.connect(DB_URI);// is connected successfully but the following logs are not printed
+    console.log("MongoDB connection established");//is logged
+    // mongoose.connection.on("connected", () => {
+    //   console.log("✅ MongoDB connected successfully");//is not logged
+    // });
 
-    mongoose.connection.on("connected", () => {
-      console.log("✅ MongoDB connected successfully");
-    });
+    // mongoose.connection.on("error", (err) => {
+    //   console.error("❌ MongoDB connection error:", err.message);//is not logged
+    // });
 
-    mongoose.connection.on("error", (err) => {
-      console.error("❌ MongoDB connection error:", err.message);
-    });
-
-    mongoose.connection.on("disconnected", () => {
-      console.log("⚠️ MongoDB disconnected");
-    });
+    // mongoose.connection.on("disconnected", () => {
+    //   console.log("⚠️ MongoDB disconnected");
+    // });
 
     return "MongoDB connected!!";
   } catch (error) {
