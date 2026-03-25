@@ -34,15 +34,18 @@ app.use("/api/user", userRouter);
 
 
 
-app.get('/', async (req, res)=>{
-  let dbConnection = await connectDB();
+import mongoose from "mongoose";
+import { DB_URI } from "../config/env.js";
 
-  res.send("server is running ||", dbConnection);
-});
-
-
-app.listen(PORT, '0.0.0.0', ()=>{
-    console.log(`server is running on http://localhost:${PORT}`);
-    connectDB();
-})
-
+const connectDB = async ()=>{
+    try{
+      await mongoose.connect(DB_URI);
+      console.log("MongoDB connected!!")
+      return "MongoDB connected!!"
+    } catch(error){
+      console.log("MongoDB connection failed", error.message);
+      process.exit(1)//exit the process with failure
+      
+    }
+}
+export default connectDB
