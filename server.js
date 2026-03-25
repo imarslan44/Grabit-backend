@@ -34,8 +34,10 @@ app.use("/api/user", userRouter);
 
 
 
-app.get('/', (req, res)=>{
-  res.send("Wellcome to E-marketplace APIs");
+app.get('/', async (req, res)=>{
+  let dbConnection = await connectDB();
+
+  res.send("server is running ||", dbConnection);
 });
 
 
