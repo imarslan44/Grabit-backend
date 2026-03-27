@@ -16,7 +16,10 @@ const app = express();
  //app.use(cors({ origin: [FRONTEND_URL, SELLER_SITE_URL] })) 
  // allow CORS for frontend and seller origins and include credentials ;
 app.use(cors({
-  origin: [FRONTEND_URL, SELLER_SITE_URL],
+  //allow ALL for testing
+
+  origin: "*",
+  // origin: [FRONTEND_URL, SELLER_SITE_URL],
   credentials: true,
 }));
 
