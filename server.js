@@ -10,6 +10,7 @@ import sellerRouter from "./routes/sellerAuth.routes.js";
 import orderRouter from "./routes/order.routes.js";
 import userRouter from "./routes/user.routes.js";
 import { FRONTEND_URL, SELLER_SITE_URL } from "./config/env.js";
+import User from "./models/user.model.js";
 console.log("CORS allowed origins:", FRONTEND_URL, SELLER_SITE_URL);
 const app = express();
 
@@ -41,8 +42,11 @@ app.use("/api/user", userRouter);
 
 app.get('/', async (req, res)=>{
   
-  console.log("DB Connection status:", dbConnection);
-  res.send("server is running ||" + dbConnection);
+  const user  = await  User.findOne() || "No user found"; 
+  res.json({message: "server is running ||",
+    data: user,
+    dbConnection: dbConnection
+  });
 });
 
 
