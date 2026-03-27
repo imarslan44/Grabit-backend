@@ -42,10 +42,10 @@ app.use("/api/user", userRouter);
 
 app.get('/', async (req, res)=>{
   
- // const user  = await  User.findOne() || "No user found"; 
+  const user  = await  User.findOne() || "No user found"; 
   res.json({message: "server is running but.||",
-    // data: user,
-    // dbConnection: dbConnection
+     data: user,
+     dbConnection: dbConnection
   });
 });
 
