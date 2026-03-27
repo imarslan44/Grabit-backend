@@ -8,14 +8,17 @@ const connectDB = async () => {
     console.log("MongoDB connection established");//is logged
      mongoose.connection.on("connected", () => {
        console.log("✅ MongoDB connected successfully");//is not logged
-     });
+       return "MongoDB connected successfully";
+    });
 
      mongoose.connection.on("error", (err) => {
        console.error("❌ MongoDB connection error:", err.message);//is not logged
+       return "MongoDB connection error: " + err.message;
    });
 
      mongoose.connection.on("disconnected", () => {
       console.log("⚠️ MongoDB disconnected");
+        return "MongoDB disconnected";
      });
 
     return "MongoDB connected!!";
