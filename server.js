@@ -13,6 +13,8 @@ import { FRONTEND_URL, SELLER_SITE_URL } from "./config/env.js";
 console.log("CORS allowed origins:", FRONTEND_URL, SELLER_SITE_URL);
 const app = express();
 
+let dbConnection = "DB not connected";
+
  //app.use(cors({ origin: [FRONTEND_URL, SELLER_SITE_URL] })) 
  // allow CORS for frontend and seller origins and include credentials ;
 app.use(cors({
@@ -38,13 +40,15 @@ app.use("/api/user", userRouter);
 
 
 app.get('/', async (req, res)=>{
-
-  res.send("server is running ||");
+  
+  console.log("DB Connection status:", dbConnection);
+  res.send("server is running ||" + dbConnection);
 });
 
 
-app.listen(PORT, '0.0.0.0', ()=>{
+app.listen(PORT, '0.0.0.0', async ()=>{
     console.log(`server is running on http://localhost:${PORT}`);
-    connectDB();
+    let connection = await connectDB() || "DB connection failed";
+     dbConnection = JSON.stringify(connection);
 })
 
