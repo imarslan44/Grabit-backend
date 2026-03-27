@@ -36,7 +36,7 @@ app.use("/api/user", userRouter);
 
 app.get('/', async (req, res)=>{
 
-  res.send("server is running ||", dbConnection);
+  res.send("server is running ||");
 });
 
 
