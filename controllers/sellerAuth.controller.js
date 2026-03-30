@@ -42,10 +42,11 @@ export const sellerSignUp = async (req, res) => {
 
     await newSeller.save();
 
+    const expiresIn = JWT_EXPIRATION || "1h";
     const token = jwt.sign(
       { sellerId: newSeller._id },
         JWT_SECRET,
-      { expiresIn: JWT_EXPIRATION || "1h" }
+      { expiresIn }
     );
 
     res.cookie("sellerToken", token, {

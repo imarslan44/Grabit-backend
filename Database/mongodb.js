@@ -1,30 +1,30 @@
 import mongoose from "mongoose";
 import { DB_URI } from "../config/env.js";
 
+let connectionPromise = null;
+
 const connectDB = async () => {
   try {
-    console.log("Connecting to MongoDB..."); //is logged
-    await mongoose.connect(DB_URI);// is connected successfully but the following logs are not printed
-    console.log("MongoDB connection established");//is logged
-     mongoose.connection.on("connected", () => {
-       console.log("✅ MongoDB connected successfully");//is not logged
-       return "MongoDB connected successfully";
-    });
+    if (!DB_URI) {
+      throw new Error("DB_URI is missing");
+    }
 
-     mongoose.connection.on("error", (err) => {
-       console.error("❌ MongoDB connection error:", err.message);//is not logged
-       return "MongoDB connection error: " + err.message;
-   });
+    if (mongoose.connection.readyState === 1) {
+      return "MongoDB connected!!";
+    }
 
-     mongoose.connection.on("disconnected", () => {
-      console.log("⚠️ MongoDB disconnected");
-        return "MongoDB disconnected";
-     });
+    if (!connectionPromise) {
+      console.log("Connecting to MongoDB...");
+      connectionPromise = mongoose.connect(DB_URI);
+    }
 
+    await connectionPromise;
+    console.log("MongoDB connection established");
     return "MongoDB connected!!";
   } catch (error) {
     console.error("MongoDB connection failed", error.message);
-    process.exit(1);
+    connectionPromise = null;
+    throw error;
   }
 };
 

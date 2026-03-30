@@ -12,7 +12,7 @@ orderRouter.post("/place/cod", authorize, placeOrderCOD);
 
 orderRouter.post("/place/razorpay", authorize, placeOrderRazorpay);
 
-orderRouter.post("/razorpay/verify", verifyRazorpay);
+orderRouter.post("/razorpay/verify", authorize, verifyRazorpay);
 
 // routes to update order data 
 

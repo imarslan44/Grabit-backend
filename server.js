@@ -11,6 +11,7 @@ import orderRouter from "./routes/order.routes.js";
 import userRouter from "./routes/user.routes.js";
 import { FRONTEND_URL, SELLER_SITE_URL } from "./config/env.js";
 import User from "./models/user.model.js";
+import mongoose from "mongoose";
 console.log("CORS allowed origins:", FRONTEND_URL, SELLER_SITE_URL);
 const app = express();
 
@@ -38,10 +39,16 @@ app.use("/api/seller", sellerRouter);
 app.use("/api/order", orderRouter)
 app.use("/api/user", userRouter);
 
+const ensureDBConnected = async () => {
+  if (mongoose.connection.readyState === 1) return "MongoDB connected!!";
+  return connectDB();
+};
 
 
 app.get('/', async (req, res)=>{
   try{
+  const connection = await ensureDBConnected();
+  dbConnection = JSON.stringify(connection);
   const user  = await  User.findOne() || "No user found"; 
   res.json({message: "server is running but.||",
      data: user,
@@ -55,10 +62,25 @@ app.get('/', async (req, res)=>{
   }
 });
 
+// Try connecting on cold start so first request is faster.
+try {
+  const connection = await ensureDBConnected();
+  dbConnection = JSON.stringify(connection);
+} catch (error) {
+  dbConnection = "DB not connected";
+}
 
-app.listen(PORT, '0.0.0.0', async ()=>{
+if (process.env.VERCEL !== "1") {
+  app.listen(PORT, "0.0.0.0", async () => {
     console.log(`server is running on http://localhost:${PORT}`);
-    let connection = await connectDB() || "DB connection failed";
-     dbConnection = JSON.stringify(connection);
-})
+    try {
+      const connection = await ensureDBConnected();
+      dbConnection = JSON.stringify(connection);
+    } catch (error) {
+      dbConnection = "DB not connected";
+    }
+  });
+}
+
+export default app;
 

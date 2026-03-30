@@ -23,7 +23,7 @@ export const signUp = async (req, res, next) => {
     const normalizedEmail = email.trim().toLowerCase();
    
 // Hash password
-    const hashedPassword =  bcrypt.hash(password, 10);
+    const hashedPassword =  await bcrypt.hash(password, 10);
 
 // Create user — rely on unique index at DB level to prevent duplicates
     const user = await User.create({
@@ -44,8 +44,8 @@ export const signUp = async (req, res, next) => {
 //send cookie
      res.cookie("token", token, {
         httpOnly: true,
-        sameSite: "lax",
-        secure: true,
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        secure: process.env.NODE_ENV === "production",
         maxAge: 24 * 60 * 60 * 1000, // 1 day
      });
 
@@ -102,8 +102,8 @@ export const signIn = async (req, res)=>{
        //send token in cookie
       res.cookie("token", token, {
         httpOnly: true,
-        sameSite: "none",
-        secure: true,
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        secure: process.env.NODE_ENV === "production",
         maxAge: 24 * 60 * 60 * 1000, // 1 day
      });
 
@@ -115,8 +115,8 @@ export const signIn = async (req, res)=>{
     });
 
    }catch(error){
-    res.status(error.statusCode).json({
-        messsage: error.message,
+    res.status(error.statusCode || 500).json({
+        message: error.message || "Internal server error",
     })
    }
 }  

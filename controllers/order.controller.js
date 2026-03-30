@@ -3,7 +3,6 @@ import Order from "../models/order.model.js";
 import Razorpay from "razorpay"
 import { KEY_ID, KEY_SECRET } from "../config/env.js";
 import crypto from "crypto"; 
-import { read } from "fs";
 
 
 
@@ -32,12 +31,13 @@ export const placeOrderRazorpay = async (req, res)=>{
         if(!product) return res.json("Invalid productId");
 
         const variant = product.variants[variantIndex]; 
+        if (!variant) return res.status(400).json({ error: "Invalid variant selection" });
 
     
 
       let actualPrice;
 
-     if (Array.isArray(variant.sizes) && variant.sizes.length > 0 && !sizeIndex ) {
+     if (Array.isArray(variant?.sizes) && variant.sizes.length > 0 && sizeIndex != null ) {
         // Use the price from the selected size if available
      actualPrice = variant.sizes[sizeIndex]?.price ?? variant.price;
     } else {
@@ -164,13 +164,14 @@ export const placeOrderCOD = async (req , res) =>{
         if(!product) return res.json("Invalid productId");
 
         const variant = product.variants[variantIndex]; 
+        if (!variant) return res.status(400).json({ error: "Invalid variant selection" });
        
         //if(price !== actualPrice ) res.json("price tempered");
 
     
       let actualPrice;
 
-     if (Array.isArray(variant.sizes) && variant.sizes.length > 0 && !sizeIndex ) {
+     if (Array.isArray(variant?.sizes) && variant.sizes.length > 0 && sizeIndex != null ) {
         // Use the price from the selected size if available
      actualPrice = variant.sizes[sizeIndex]?.price ?? variant.price;
     } else {
@@ -193,7 +194,7 @@ export const placeOrderCOD = async (req , res) =>{
             address,
             sizeIndex,
             status: "placed",
-            paymentType: "razorpay",
+            paymentType: "cod",
             paymentStatus: "pending",
             amount
             
