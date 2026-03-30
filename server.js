@@ -17,15 +17,18 @@ const app = express();
 
 let dbConnection = "DB not connected";
 
- //app.use(cors({ origin: [FRONTEND_URL, SELLER_SITE_URL] })) 
- // allow CORS for frontend and seller origins and include credentials ;
-app.use(cors({
-  //allow ALL for testing
-
-  origin: "*",
-  // origin: [FRONTEND_URL, SELLER_SITE_URL],
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow non-browser tools (no Origin header)
+      if (!origin) return callback(null, true);
+      // With credentials: true, we must NEVER return '*' from CORS.
+      // Echo back the requesting origin so cookies work across origins.
+      return callback(null, origin);
+    },
+    credentials: true,
+  })
+);
 
 
 app.use(express.json());
@@ -38,6 +41,7 @@ app.use("/api/product", productRouter);
 app.use("/api/seller", sellerRouter);
 app.use("/api/order", orderRouter)
 app.use("/api/user", userRouter);
+
 
 const ensureDBConnected = async () => {
   if (mongoose.connection.readyState === 1) return "MongoDB connected!!";
