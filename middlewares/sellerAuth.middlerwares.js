@@ -4,10 +4,14 @@ import { JWT_SECRET } from "../config/env.js";
 
 export const AuthorizeSeller = async (req, res, next) => {
   try {
-    const token = req.cookies.sellerToken; // match cookie name
-    
-    
-  
+    // Prefer cookie auth, but also accept bearer token for local dev.
+    const cookieToken = req.cookies?.sellerToken; // match cookie name
+    const authHeader = req.headers?.authorization || "";
+    const bearerToken = authHeader.startsWith("Bearer ")
+      ? authHeader.slice(7)
+      : null;
+    const token = cookieToken || bearerToken;
+
     if (!token) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
