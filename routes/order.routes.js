@@ -22,7 +22,7 @@ orderRouter.patch("/cancel/:id", authorize, cancelRequest)
 
 // routes to get order details
 
-orderRouter.get("/seller", AuthorizeSeller ,getSellerOrders);
+orderRouter.post("/seller", AuthorizeSeller ,getSellerOrders);
 
 orderRouter.get("/user", authorize, getUserOrders);
 

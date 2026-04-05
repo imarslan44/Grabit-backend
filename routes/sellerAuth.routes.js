@@ -9,5 +9,7 @@ sellerRouter.post("/sign-in", sellerSignIn);
 
 sellerRouter.get("/authorize/token", AuthorizeSeller, AuthorizeSellerToken);
 
+
+
 export default sellerRouter; 
 

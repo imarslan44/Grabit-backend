@@ -61,7 +61,7 @@ export const getSellerProducts = async (req, res)=>{
    
 try{
 
-    const products = await Product.find({sellerId});
+    const products = await Product.find({sellerId}).lean().sort({createdAt: -1}).exec(); //by using exec() we can get a real promise and use try catch for error handling
 
     if(!products) return res.status(200).json({
         success: false,

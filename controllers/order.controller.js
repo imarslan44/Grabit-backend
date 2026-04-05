@@ -1,8 +1,9 @@
 import Product from "../models/product.model.js";
 import Order from "../models/order.model.js";
 import Razorpay from "razorpay"
-import { KEY_ID, KEY_SECRET } from "../config/env.js";
+import { KEY_ID, KEY_SECRET, SHIPPING_FEE } from "../config/env.js";
 import crypto from "crypto"; 
+import { title } from "process";
 
 
 
@@ -221,31 +222,67 @@ export const placeOrderCOD = async (req , res) =>{
     }
 }
 
+
 export const getSellerOrders = async (req, res) => {
   const sellerId = req.sellerId; 
+
+  const status = req.body?.status?.toUpperCase() || "PLACED"; // Get status from query params and convert to uppercase
+
  
   try {
-    const orders = await Order.find({ sellerId });
 
-    if (orders.length === 0) {
+    //only fetch order with status === status & sort by createdAt desc &  also populate full user details and  product details and variant details and also return product image in response
+    const orders = await Order.find({ sellerId, status }).lean().populate({
+      path: "userId",
+      select: "name email",
+    }).populate({
+      path: "productId",
+      select: "title variants",
+    });
+
+
+      if (orders.length === 0) {
+        return res.status(200).json({
+          success: true,
+          message: "No orders found!",
+          orders: [],
+        });
+      }
+
+      // Attach product image and returnPolicy to each order
+      const enrichedOrders = orders.map((order) => {
+        const product = order.productId;
+        const variant = product.variants?.[order.variantIndex];
+        const productImage =
+        variant?.images?.[0] || product.variants?.[0]?.images?.[0] || "";
+        const returnPolicy = product.delivery?.returnPolicy || null;
+        const price = variant.sizes[order.sizeIndex]?.price || variant.price || "Free";
+        const size = variant.sizes?.[order.sizeIndex]?.size || null;
+       
+
+
+        return {
+          ...order,
+          variant,
+          price,
+          productId: product._id,
+          title: product.title,
+          productImage,
+          returnPolicy,
+          amount: order.amount, // send price without shipping fee to seller,
+          shippingFee: SHIPPING_FEE,
+          size,
+          
+        };
+      });
+      
+
       return res.status(200).json({
         success: true,
-        message: "No orders yet!",
-        orders: [],
+        message: "Orders retrieved!",
+        orders: enrichedOrders,
       });
-    }
 
-  const orderData = await Promise.all( orders.map(async (odr) => { const { productId } = odr; const product = await Product.findById(productId).lean(); // lean gives plain object
-   return { ...odr.toObject(), product }; // convert order to plain object 
-  }) 
-);
-  
-
-    return res.status(200).json({
-      success: true,
-      message: "Orders retrieved",
-      orderData,
-    });
   } catch (error) {
     console.error(error);
     return res.status(500).json({
@@ -254,6 +291,9 @@ export const getSellerOrders = async (req, res) => {
     });
   }
 };
+
+
+
 
 
 export const getUserOrders = async (req, res) => {

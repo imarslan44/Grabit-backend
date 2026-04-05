@@ -9,6 +9,7 @@ import productRouter from "./routes/product.routes.js";
 import sellerRouter from "./routes/sellerAuth.routes.js";
 import orderRouter from "./routes/order.routes.js";
 import userRouter from "./routes/user.routes.js";
+import insightsRouter from "./routes/insights.routes.js";
 import { FRONTEND_URL, SELLER_SITE_URL } from "./config/env.js";
 import User from "./models/user.model.js";
 import mongoose from "mongoose";
@@ -41,6 +42,7 @@ app.use("/api/product", productRouter);
 app.use("/api/seller", sellerRouter);
 app.use("/api/order", orderRouter)
 app.use("/api/user", userRouter);
+app.use("/api/insights", insightsRouter);
 
 
 const ensureDBConnected = async () => {
