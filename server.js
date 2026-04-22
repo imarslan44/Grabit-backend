@@ -18,7 +18,7 @@ import { rateLimit } from "express-rate-limit";
 // Create a rate limiter
 const limiter = rateLimit({
   windowMs: 10 * 60 * 100, //10 seconds
-  max: 5 // limit each IP to 100 requests per windowMs
+  max: 100// limit each IP to 100 requests per windowMs
 });
 //do i need to install express-rate-limit to import this?
 // yes use npm install express-rate-limit
