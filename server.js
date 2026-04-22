@@ -13,6 +13,18 @@ import insightsRouter from "./routes/insights.routes.js";
 import { FRONTEND_URL, SELLER_SITE_URL } from "./config/env.js";
 import User from "./models/user.model.js";
 import mongoose from "mongoose";
+//import express rate limiter
+import { rateLimit } from "express-rate-limit";
+// Create a rate limiter
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 100, //10 seconds
+  max: 5 // limit each IP to 100 requests per windowMs
+});
+//do i need to install express-rate-limit to import this?
+// yes use npm install express-rate-limit
+
+
+
 console.log("CORS allowed origins:", FRONTEND_URL, SELLER_SITE_URL);
 const app = express();
 
@@ -34,6 +46,8 @@ app.use(
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(limiter); // Apply the rate limiter to all requests 
+//does this limit applies 
 
 //routes middlewares
 app.use("/api/auth", userAuthRouter);
@@ -75,6 +89,7 @@ try {
 } catch (error) {
   dbConnection = "DB not connected";
 }
+
 
 if (process.env.VERCEL !== "1") {
   app.listen(PORT, "0.0.0.0", async () => {
