@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getProductList, getProductDetail, getSellerProducts, addProduct, updateProduct, deleteProduct } from "../controllers/product.controller.js";
+import { getProductList, getProductDetail, getSellerProducts, addProduct, updateProduct, deleteProduct, searchProducts } from "../controllers/product.controller.js";
 import upload from "../middlewares/multer.js";
 import { AuthorizeSeller } from "../middlewares/sellerAuth.middlerwares.js";
 
@@ -20,6 +20,8 @@ productRouter.get("/:id", getProductDetail);
 productRouter.patch("/:id", AuthorizeSeller, updateProduct);
 
 productRouter.delete("/:id", AuthorizeSeller, deleteProduct);
+
+productRouter.get("/search/:query", searchProducts);
 
 export default productRouter
 

@@ -76,7 +76,6 @@ try{
     });
 
 }catch(error){
-    console.log(error)
     return res.status(500).json({success: false, message: "Internal server error!",
     });
 
@@ -135,7 +134,6 @@ const parseVariants = JSON.parse(variants)
 
 
 const finalVarients = parseVariants.map((variant)=>{
-    console.log(variant)
     const imageCount = variant.images.length;
     const endPoint = fieldIndex + imageCount
     const images = uploadedUrls.slice(fieldIndex, endPoint);
@@ -165,8 +163,7 @@ const finalProduct = {
 
 
     const newProduct = await new Product(finalProduct);
-     newProduct.save();
-     console.log()
+    newProduct.save();
      if(!newProduct) return res.status(401).json("something went wrong");
 
     return res.status(201).json({
@@ -238,3 +235,52 @@ export const deleteProduct = async (req, res) => {
     });
   }
 };
+
+
+//search product by name, category, subcategory, attributes, brand, model etc....
+
+export const searchProducts = async (req, res)=> {
+    const query = req.params.query || req.query.query;
+    console.log("Search query:", query);
+
+    if (!query) {
+        return res.status(400).json({
+            success: false,
+            message: "Search query is missing",
+        });
+    }
+
+    try{
+
+        // if title, category, subcategory, attributes, brand or model includes the query then return the products
+
+        const searchResults = await Product.find({
+            $or: [
+                { title: { $regex: query, $options: "i" } },
+                { category: { $regex: query, $options: "i" } }, 
+                { subcategory: { $regex: query, $options: "i" } },
+                { brand: { $regex: query, $options: "i" } },
+                { model: { $regex: query, $options: "i" } }
+            ]
+        });//attributes search can be implemented here by using $elemMatch for array of objects
+
+        if(searchResults.length === 0) return res.status(200).json({
+            success: false,
+            message: "No search results found",
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Search results found",
+            data: searchResults
+        });
+
+    } catch(error){
+        return res.status(500).json({success: false, message: "Internal server error"})
+    }
+
+
+
+
+
+}
